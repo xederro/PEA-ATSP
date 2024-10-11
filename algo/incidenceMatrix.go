@@ -3,10 +3,51 @@ package algo
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 // IncidenceMatrix is a representation of a graph using an incidence matrix
 type IncidenceMatrix []Array[int]
+
+// NewIncidenceMatrixFromFile creates a new IncidenceMatrix
+func NewIncidenceMatrixFromFile(path string) *IncidenceMatrix {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	f := strings.ReplaceAll(string(file), "\r", "")
+	ret := strings.Split(f, "\n")
+	atoi, err := strconv.Atoi(ret[0])
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	r, err := regexp.Compile(`\d+|-1`)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	im := NewIncidenceMatrix(atoi)
+	for y, v := range ret[1:] {
+		lines := r.FindAllString(v, -1)
+		for x, val := range lines {
+			weight, err := strconv.Atoi(val)
+			if err != nil {
+				fmt.Println(err)
+				return nil
+			}
+			(*im)[y][x] = weight
+		}
+	}
+
+	return im
+}
 
 // NewIncidenceMatrix creates a new IncidenceMatrix
 func NewIncidenceMatrix(n int) *IncidenceMatrix {
@@ -82,7 +123,7 @@ func (m *IncidenceMatrix) GetEdges() map[[2]int]*int {
 
 // GetNodes returns a list of nodes
 func (m *IncidenceMatrix) GetNodes() []int {
-	return NewArray[int](m.Len())
+	return NewArray[int](m.Len()).PopulateWithCounting()
 }
 
 // GetAdj returns a list of adjacent nodes

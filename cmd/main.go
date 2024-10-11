@@ -29,4 +29,7 @@ func main() {
 	a := algo.NewIncidenceMatrix(10)
 	a.Generate()
 	fmt.Println(a.Stringify())
+
+	a = algo.NewIncidenceMatrixFromFile("D:\\projects\\PEA-ATSP\\tests\\tsp_10.txt")
+	fmt.Println(a.Stringify())
 }

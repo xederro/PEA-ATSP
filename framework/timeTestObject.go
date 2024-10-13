@@ -1,45 +1,55 @@
-// Package framework Description: This file contains the TTO struct and its methods.
+// Package framework Description: This file contains the TimeTestObject struct and its methods.
 package framework
 
 import (
 	"time"
 )
 
-// TTO is a struct that represents a single test.
-type TTO struct {
-	name    string
-	before  func(size int) any
-	measure func(data any) any
-	after   func(name string, nr int, testSize int, time time.Duration, data any)
-	time    time.Duration
-	print   bool
+// TimeTestObject is a struct that represents a single test.
+type TimeTestObject struct {
+	name          string
+	before        func(size int) any
+	measure       func(data any) any
+	after         func(name string, nr int, testSize int, time time.Duration, data any)
+	time          time.Duration
+	print         bool
+	timeout       time.Duration
+	failOnTimeout bool
+	failed        int
 }
 
-// NewTTO creates a new TTO object.
-func NewTTO(name string, print bool) *TTO {
-	return &TTO{
-		name:    name,
-		before:  Before,
-		measure: Measure,
-		after:   After,
-		print:   print,
+// NewTimeTestObject creates a new TimeTestObject object.
+func NewTimeTestObject(name string, print bool, failOnTimeout bool) *TimeTestObject {
+	return &TimeTestObject{
+		name:          name,
+		before:        Before,
+		measure:       Measure,
+		after:         After,
+		print:         print,
+		failOnTimeout: failOnTimeout,
 	}
 }
 
+// SetTimeout sets the timeout duration
+func (test *TimeTestObject) SetTimeout(timeout time.Duration) *TimeTestObject {
+	test.timeout = timeout
+	return test
+}
+
 // SetBefore sets the function to be called before each repetition.
-func (test *TTO) SetBefore(sb func(size int) any) *TTO {
+func (test *TimeTestObject) SetBefore(sb func(size int) any) *TimeTestObject {
 	test.before = sb
 	return test
 }
 
 // SetAfter sets the function to be called after each repetition.
-func (test *TTO) SetAfter(sa func(name string, nr int, testSize int, time time.Duration, data any)) *TTO {
+func (test *TimeTestObject) SetAfter(sa func(name string, nr int, testSize int, time time.Duration, data any)) *TimeTestObject {
 	test.after = sa
 	return test
 }
 
 // SetMeasure sets the function that is meant to be measured.
-func (test *TTO) SetMeasure(sm func(data any) any) *TTO {
+func (test *TimeTestObject) SetMeasure(sm func(data any) any) *TimeTestObject {
 	test.measure = sm
 	return test
 }

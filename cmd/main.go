@@ -32,8 +32,8 @@ func main() {
 
 	fmt.Println(ts)
 
-	framework.NewTimeTestHarness(1, 15).AddTest(
-		framework.NewTTO("Test", false).
+	framework.NewTimeTestHarness(10, 12).AddTest(
+		framework.NewTimeTestObject("Test", true, true).
 			SetBefore(func(size int) any {
 				//a := algo.NewIncidenceMatrixFromFile("D:\\projects\\PEA-ATSP\\tests\\tsp_12.txt")
 				a := algo.NewIncidenceMatrix(size).Generate()
@@ -51,6 +51,6 @@ func main() {
 				fmt.Println(time)
 				fmt.Println(data.(*methods.Res).Value)
 				fmt.Println(data.(*methods.Res).Route)
-			}),
+			}).SetTimeout(8 * time.Second),
 	).Exec()
 }

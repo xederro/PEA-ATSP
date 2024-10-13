@@ -2,58 +2,79 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
 )
 
-// TTH is a struct that represents a test harness.
-type TTH struct {
+// TimeTestHarness is a struct that represents a test harness.
+type TimeTestHarness struct {
 	repeat int
 	sizes  []int
-	tests  []*TTO
+	tests  []*TimeTestObject
 }
 
 // NewTimeTestHarness creates a new TimeTestHarness with the given number of repetitions.
-func NewTimeTestHarness(repeat int, testSize ...int) *TTH {
+func NewTimeTestHarness(repeat int, testSize ...int) *TimeTestHarness {
 	if len(testSize) == 0 {
 		testSize = []int{0}
 	}
 
-	return &TTH{
+	return &TimeTestHarness{
 		repeat: repeat,
 		sizes:  testSize,
 	}
 }
 
 // AddTest adds a test to the test harness.
-func (test *TTH) AddTest(t *TTO) *TTH {
+func (test *TimeTestHarness) AddTest(t *TimeTestObject) *TimeTestHarness {
 	test.tests = append(test.tests, t)
 	return test
 }
 
 // Exec executes the test harness.
-func (test *TTH) Exec() {
+func (test *TimeTestHarness) Exec() {
 	for _, t := range test.tests {
 		for _, size := range test.sizes {
 			for i := range test.repeat {
-				d := t.before(size)
-				start := time.Now()
-				m := t.measure(d)
-				dur := time.Since(start)
-				t.time += dur
-				t.after(t.name, i, size, dur, m)
+				if t.failOnTimeout {
+					d := t.before(size)
+					out := make(chan any, 1)
+					ctxTimeout, cancel := context.WithTimeout(context.TODO(), t.timeout)
+					start := time.Now()
+					go func(ctx context.Context, ch chan any) {
+						ch <- t.measure(d)
+					}(ctxTimeout, out)
+					select {
+					case res := <-out:
+						m := res
+						dur := time.Since(start)
+						t.time += dur
+						t.after(t.name, i, size, dur, m)
+					case <-ctxTimeout.Done():
+						t.failed++
+					}
+					cancel()
+				} else {
+					d := t.before(size)
+					start := time.Now()
+					m := t.measure(d)
+					dur := time.Since(start)
+					t.time += dur
+					t.after(t.name, i, size, dur, m)
+				}
 			}
 
 			if t.print {
-				fmt.Printf("%s;%d;%d\n", t.name, size, t.time.Nanoseconds()/int64(test.repeat))
+				fmt.Printf("%s;%d;%d;%d;%d\n", t.name, size, t.failed, test.repeat, t.time.Nanoseconds()/int64(test.repeat-t.failed))
 			}
 		}
 	}
 }
 
 // ExecWG executes the test harness with a wait group.
-func (test *TTH) ExecWG(wg *sync.WaitGroup) {
+func (test *TimeTestHarness) ExecWG(wg *sync.WaitGroup) {
 	test.Exec()
 	if wg != nil {
 		wg.Done()

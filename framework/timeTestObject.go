@@ -1,7 +1,9 @@
 // Package framework Description: This file contains the TTO struct and its methods.
 package framework
 
-import "time"
+import (
+	"time"
+)
 
 // TTO is a struct that represents a single test.
 type TTO struct {

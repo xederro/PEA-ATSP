@@ -1,14 +1,10 @@
-package methods
+package bruteforce
 
 import (
 	"github.com/xederro/PEA-ATSP/algo"
+	"github.com/xederro/PEA-ATSP/algo/methods"
 	"math"
 )
-
-type Res struct {
-	Value int
-	Route algo.Array[int]
-}
 
 type Bruteforce struct {
 	im *algo.IncidenceMatrix
@@ -20,7 +16,7 @@ func NewBruteforce(im *algo.IncidenceMatrix) *Bruteforce {
 	}
 }
 
-func (b *Bruteforce) Solve() *Res {
+func (b *Bruteforce) Solve() *methods.Res {
 	//https://www.quickperm.org/
 	a := algo.Array[int](b.im.GetNodes())
 	p := algo.NewArray[int](b.im.Len() + 1).PopulateWithCounting()
@@ -46,7 +42,7 @@ func (b *Bruteforce) Solve() *Res {
 		}
 	}
 
-	return &Res{
+	return &methods.Res{
 		Value: minKnown,
 		Route: minKnownInstance,
 	}

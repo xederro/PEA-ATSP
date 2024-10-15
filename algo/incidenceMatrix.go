@@ -2,6 +2,7 @@ package algo
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"regexp"
@@ -144,6 +145,11 @@ func (m *IncidenceMatrix) GetWeight(u int, v int) int {
 	return (*m)[u][v]
 }
 
+// SetWeight sets weight
+func (m *IncidenceMatrix) SetWeight(u int, v int, w int) {
+	(*m)[u][v] = w
+}
+
 // Len returns the length of the graph
 func (m *IncidenceMatrix) Len() int {
 	return len(*m)
@@ -172,4 +178,79 @@ func (m *IncidenceMatrix) Copy() *IncidenceMatrix {
 	}
 
 	return (*IncidenceMatrix)(&al)
+}
+
+func (b *IncidenceMatrix) GetMinCol(col int) int {
+	minVal := math.MaxInt32
+	for i := range b.Len() {
+		if (*b)[i][col] != -1 && (*b)[i][col] < minVal {
+			minVal = (*b)[i][col]
+		}
+	}
+	if minVal == math.MaxInt32 {
+		return 0
+	}
+	return minVal
+}
+
+func (b *IncidenceMatrix) GetMinRow(row int) int {
+	minVal := math.MaxInt32
+	for i := range b.Len() {
+		if (*b)[row][i] != -1 && (*b)[row][i] < minVal {
+			minVal = (*b)[row][i]
+		}
+	}
+	if minVal == math.MaxInt32 {
+		return 0
+	}
+	return minVal
+}
+
+func (b *IncidenceMatrix) ReduceCol(col int) int {
+	m := b.GetMinCol(col)
+	if m == 0 {
+		return m
+	}
+	for i := range b.Len() {
+		if (*b)[i][col] != -1 {
+			(*b)[i][col] -= m
+		}
+	}
+	return m
+}
+
+func (b *IncidenceMatrix) ReduceRow(row int) int {
+	m := b.GetMinRow(row)
+	if m == 0 {
+		return m
+	}
+	for i := range b.Len() {
+		if (*b)[row][i] != -1 {
+			(*b)[row][i] -= m
+		}
+	}
+	return m
+}
+
+func (b *IncidenceMatrix) DiscardCol(col int) {
+	for i := range b.Len() {
+		(*b)[i][col] = -1
+	}
+}
+
+func (b *IncidenceMatrix) DiscardRow(row int) {
+	for i := range b.Len() {
+		(*b)[row][i] = -1
+	}
+}
+
+func (b *IncidenceMatrix) ReduceMatrix() int {
+	reduced := 0
+	for i := range b.Len() {
+		reduced += b.ReduceRow(i)
+	}
+	for i := range b.Len() {
+		reduced += b.ReduceCol(i)
+	}
+	return reduced
 }

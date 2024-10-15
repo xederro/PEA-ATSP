@@ -135,3 +135,16 @@ func (arr Array[T]) Swap(p1, p2 int) {
 		arr[p1], arr[p2] = arr[p2], arr[p1]
 	}
 }
+
+func (arr Array[T]) Copy() Array[T] {
+	c := NewArray[T](len(arr))
+	copy(c, arr)
+	return c
+}
+
+func (arr Array[T]) Reverse() Array[T] {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+	return arr
+}

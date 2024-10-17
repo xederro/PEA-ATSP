@@ -87,5 +87,5 @@ func (b *Little) calc(a *Node) (int, algo.Array[int]) {
 	count += b.im.GetWeight(a.self, root.self)
 	in = append(in, a.self)
 
-	return count, in.Reverse()
+	return count, in
 }

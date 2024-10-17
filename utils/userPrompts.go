@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"github.com/charmbracelet/huh"
 	"log"
+	"os"
 	"strconv"
 )
 
@@ -16,7 +19,19 @@ func GetPath() string {
 			huh.NewInput().
 				Title("Insert path to file with values").
 				Prompt("> ").
-				Value(&path),
+				Value(&path).
+				Validate(func(str string) error {
+					fileInfo, err := os.Stat(str)
+					if err != nil {
+						return errors.New(fmt.Sprintf("%s is not a file", str))
+					}
+
+					if fileInfo.IsDir() {
+						return errors.New(fmt.Sprintf("%s is not a file", str))
+					}
+
+					return nil
+				}),
 		),
 	).WithTheme(huh.ThemeCharm())
 
@@ -25,6 +40,39 @@ func GetPath() string {
 		log.Fatalln("Error with form")
 	}
 	return path
+}
+
+// GetSize is a function that allows user to choose size
+func GetSize() int {
+	var size string
+
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Insert size of an matrix").
+				Prompt("> ").
+				Value(&size).
+				Validate(func(str string) error {
+					_, err := strconv.Atoi(str)
+					if err != nil {
+						return errors.New("Cannot be represented as int")
+					}
+					return nil
+				}),
+		),
+	).WithTheme(huh.ThemeCharm())
+
+	err := form.Run()
+	if err != nil {
+		log.Fatalln("Error with form")
+	}
+
+	atoi, err := strconv.Atoi(size)
+	if err != nil {
+		log.Fatalln("Error with form")
+	}
+
+	return atoi
 }
 
 // ParseArgs is a function that parses string arguments to int

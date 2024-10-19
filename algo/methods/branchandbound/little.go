@@ -67,7 +67,7 @@ func (b *Little) Solve() *methods.Res {
 				minKnown, minKnownInstance := b.calc(t)
 				return &methods.Res{
 					Value: minKnown,
-					Route: minKnownInstance,
+					Route: minKnownInstance.Reverse(),
 				}
 			}
 		}

@@ -4,6 +4,7 @@ package framework
 import (
 	"context"
 	"fmt"
+	"github.com/xederro/PEA-ATSP/algo/methods"
 	"sync"
 	"time"
 )
@@ -40,10 +41,10 @@ func (test *TimeTestHarness) Exec() {
 			for i := range test.repeat {
 				if t.failOnTimeout {
 					d := t.before(size)
-					out := make(chan any, 1)
+					out := make(chan *methods.Res, 1)
 					ctxTimeout, cancel := context.WithTimeout(context.TODO(), t.timeout)
 					start := time.Now()
-					go func(ctx context.Context, ch chan any) {
+					go func(ctx context.Context, ch chan *methods.Res) {
 						ch <- t.measure(d)
 					}(ctxTimeout, out)
 					select {

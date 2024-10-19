@@ -69,17 +69,17 @@ func manual() {
 			framework.NewTimeTestHarness(1, 0).
 				AddTest(
 					framework.NewTimeTestObject("BruteForce", false, false).
-						SetBefore(func(size int) any {
+						SetBefore(func(size int) methods.Method {
 							return bruteforce.NewBruteforce(im)
 						}).
-						SetMeasure(func(data any) any {
-							return data.(methods.Method).Solve()
+						SetMeasure(func(data methods.Method) *methods.Res {
+							return data.Solve()
 						}).
-						SetAfter(func(name string, nr int, testSize int, time time.Duration, data any) {
+						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
 							fmt.Println("Results of bruteforce:")
 							fmt.Println(time)
-							fmt.Println(data.(*methods.Res).Value)
-							fmt.Println(data.(*methods.Res).Route)
+							fmt.Println(data.Value)
+							fmt.Println(data.Route)
 						}),
 				).
 				Exec()
@@ -88,17 +88,17 @@ func manual() {
 			framework.NewTimeTestHarness(1, 0).
 				AddTest(
 					framework.NewTimeTestObject("Little", false, false).
-						SetBefore(func(size int) any {
+						SetBefore(func(size int) methods.Method {
 							return branchandbound.NewLittle(im)
 						}).
-						SetMeasure(func(data any) any {
-							return data.(methods.Method).Solve()
+						SetMeasure(func(data methods.Method) *methods.Res {
+							return data.Solve()
 						}).
-						SetAfter(func(name string, nr int, testSize int, time time.Duration, data any) {
+						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
 							fmt.Println("Results of Little's algorithm:")
 							fmt.Println(time)
-							fmt.Println(data.(*methods.Res).Value)
-							fmt.Println(data.(*methods.Res).Route)
+							fmt.Println(data.Value)
+							fmt.Println(data.Route)
 						}),
 				).
 				Exec()

@@ -44,7 +44,7 @@ func (b *Bruteforce) Solve() *methods.Res {
 
 	return &methods.Res{
 		Value: minKnown,
-		Route: minKnownInstance,
+		Route: minKnownInstance.Reverse(),
 	}
 }
 

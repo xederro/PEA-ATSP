@@ -23,18 +23,15 @@ func NewLittle(im *algo.IncidenceMatrix) *Little {
 func (b *Little) Solve() *methods.Res {
 	var q *PriorityQueue
 	{
-		var tmpArr []*Node
 		tmpIm := b.im.Copy()
 		tmpVal := tmpIm.ReduceMatrix()
-		for i := range b.im.Len() {
-			tmpArr = append(tmpArr, &Node{
-				im:     tmpIm.Copy(),
-				todo:   b.im.GetAdj(i),
-				parent: nil,
-				self:   i,
-				val:    tmpVal,
-			})
-		}
+		tmpArr := []*Node{{
+			im:     tmpIm.Copy(),
+			todo:   b.im.GetAdj(0),
+			parent: nil,
+			self:   0,
+			val:    tmpVal,
+		}}
 		q = NewPriorityQueue(tmpArr)
 	}
 
@@ -85,7 +82,7 @@ func (b *Little) calc(a *Node) (int, algo.Array[int]) {
 		in = append(in, root.self)
 	}
 	count += b.im.GetWeight(a.self, root.self)
-	in = append(in, a.self)
+	in = append([]int{a.self}, in...)
 
 	return count, in
 }

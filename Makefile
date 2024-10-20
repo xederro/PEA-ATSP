@@ -1,7 +1,5 @@
 SHELL=cmd.exe
 
-SHELL=cmd.exe
-
 manual: prod
 	.\cmd.exe
 
@@ -11,7 +9,7 @@ build:
 	go build .\cmd
 
 run:
-	chcp 65001 & .\cmd.exe -cpu -ek -ff -bf -d -k -p -c 100 4 5 6 7 8 > data.csv
+	chcp 65001 & .\cmd.exe -cpu -bf -bab -rep 10 -con 4 5 6 7 8 > data.csv
 
 prod:
 	go build -ldflags "-s -w" .\cmd

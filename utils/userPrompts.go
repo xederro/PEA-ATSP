@@ -76,9 +76,9 @@ func GetSize() int {
 }
 
 // ParseArgs is a function that parses string arguments to int
-func ParseArgs(args *[]string) ([]int, error) {
+func ParseArgs(args []string) ([]int, error) {
 	var result []int
-	for _, arg := range *args {
+	for _, arg := range args {
 		i, err := strconv.Atoi(arg)
 		if err != nil {
 			return nil, err

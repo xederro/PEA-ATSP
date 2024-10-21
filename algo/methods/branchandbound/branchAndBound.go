@@ -6,25 +6,30 @@ import (
 	"math"
 )
 
-type Little struct {
+// BranchAndBound struct that holds data for algorithm
+type BranchAndBound struct {
 	im    *algo.IncidenceMatrix
 	lower int
 	upper int
 }
 
-func NewLittle(im *algo.IncidenceMatrix) *Little {
-	return &Little{
+// NewBranchAndBound is a constructor for BranchAndBound struct
+func NewBranchAndBound(im *algo.IncidenceMatrix) *BranchAndBound {
+	return &BranchAndBound{
 		im:    im.Copy(),
 		lower: 0,
 		upper: math.MaxInt64,
 	}
 }
 
-func (b *Little) Solve() *methods.Res {
+// Solve function that solves the tsp
+func (b *BranchAndBound) Solve() *methods.Res {
+	// create priority queue and add first element to it
 	var q *PriorityQueue
 	{
 		tmpIm := b.im.Copy()
 		tmpVal := tmpIm.ReduceMatrix()
+		b.lower = tmpVal
 		tmpArr := []*Node{{
 			im:     tmpIm.Copy(),
 			todo:   b.im.GetAdj(0),
@@ -35,6 +40,7 @@ func (b *Little) Solve() *methods.Res {
 		q = NewPriorityQueue(tmpArr)
 	}
 
+	// if not empty then go through all states with the lowest current value
 	for !q.IsEmpty() {
 		t, err := q.GetRoot()
 		if err != nil {
@@ -61,6 +67,7 @@ func (b *Little) Solve() *methods.Res {
 					q.Insert(tmp)
 				}
 			} else {
+				// if found the closest value then return
 				minKnown, minKnownInstance := b.calc(t)
 				return &methods.Res{
 					Value: minKnown,
@@ -72,7 +79,8 @@ func (b *Little) Solve() *methods.Res {
 	return nil
 }
 
-func (b *Little) calc(a *Node) (int, algo.Array[int]) {
+// calc is a function that calculates the current value for an BNB instance
+func (b *BranchAndBound) calc(a *Node) (int, algo.Array[int]) {
 	count := 0
 	in := algo.NewArray[int](0)
 	root := a

@@ -62,7 +62,7 @@ func (c Config) runBranchAndBound(wg *sync.WaitGroup, count int, sizes ...int) {
 		AddTest(
 			framework.NewTimeTestObject("BranchAndBound", true, true).
 				SetBefore(func(size int) methods.Method {
-					return branchandbound.NewLittle(
+					return branchandbound.NewBranchAndBound(
 						algo.NewIncidenceMatrix(size).
 							Generate(),
 					)

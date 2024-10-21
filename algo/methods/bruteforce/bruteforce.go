@@ -17,7 +17,7 @@ func NewBruteforce(im *algo.IncidenceMatrix) *Bruteforce {
 }
 
 func (b *Bruteforce) Solve() *methods.Res {
-	//https://www.quickperm.org/
+	// get every permutation using quick perm algorithm https://www.quickperm.org/
 	a := algo.Array[int](b.im.GetNodes())
 	p := algo.NewArray[int](b.im.Len() + 1).PopulateWithCounting()
 	minKnown := b.calc(a)
@@ -35,6 +35,7 @@ func (b *Bruteforce) Solve() *methods.Res {
 			i++
 		}
 
+		// calc value for current permutation
 		c := b.calc(a)
 		if minKnown > c {
 			minKnown = c
@@ -48,6 +49,7 @@ func (b *Bruteforce) Solve() *methods.Res {
 	}
 }
 
+// calc is a function that calculates the current value for an BF instance
 func (b *Bruteforce) calc(a algo.Array[int]) int {
 	count := b.im.GetWeight(a[0], a[len(a)-1])
 	for i := 1; i < len(a); i++ {

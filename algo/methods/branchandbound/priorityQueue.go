@@ -2,6 +2,7 @@ package branchandbound
 
 import (
 	"errors"
+	"sort"
 )
 
 // PriorityQueue is a data structure that allows to keep track of elements in a priority queue
@@ -102,4 +103,16 @@ func (h *PriorityQueue) SetSort(s func(pIdx, cIdx *Node) bool) *PriorityQueue {
 // Min is a function that compares two elements in the heap
 func Min(pObj, cObj *Node) bool {
 	return pObj.val < cObj.val
+}
+
+// RemoveBig leaves 10000 instances with smallest current values
+func (h *PriorityQueue) RemoveBig() *PriorityQueue {
+	sort.Slice(h.arr, func(i, j int) bool {
+		return Min(h.arr[i], h.arr[j])
+	})
+	if len(h.arr) >= 10000 {
+		h.arr = h.arr[:10000]
+	}
+	h.BuildQueue()
+	return h
 }

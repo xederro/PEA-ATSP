@@ -17,7 +17,7 @@ const (
 	READ
 	WRITE
 	BRUTEFORCE
-	LITTLE
+	BRANCHANDBOUND
 	EXIT
 )
 
@@ -36,8 +36,8 @@ func manual() {
 			allowed = append(
 				allowed,
 				huh.NewOption[int]("Display matrix", WRITE),
-				huh.NewOption[int]("Solve by bruteforce", BRUTEFORCE),
-				huh.NewOption[int]("Solve by BranchAndBound's algorithm", LITTLE),
+				huh.NewOption[int]("Solve by BruteForce", BRUTEFORCE),
+				huh.NewOption[int]("Solve by BranchAndBound's algorithm", BRANCHANDBOUND),
 			)
 		}
 
@@ -78,7 +78,7 @@ func manual() {
 							return data.Solve()
 						}).
 						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
-							fmt.Println("Results of bruteforce:")
+							fmt.Println("Results of BruteForce:")
 							fmt.Println(time)
 							fmt.Println(data.Value)
 							fmt.Println(data.Route)
@@ -86,7 +86,7 @@ func manual() {
 				).
 				Exec()
 			break
-		case LITTLE:
+		case BRANCHANDBOUND:
 			framework.NewTimeTestHarness(1, 0).
 				AddTest(
 					framework.NewTimeTestObject("BranchAndBound", false, false).

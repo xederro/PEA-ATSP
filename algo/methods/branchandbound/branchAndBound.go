@@ -74,6 +74,7 @@ func (b *BranchAndBound) Solve() *methods.Res {
 					Route: minKnownInstance.Reverse(),
 				}
 			}
+			q.RemoveBig()
 		}
 	}
 	return nil

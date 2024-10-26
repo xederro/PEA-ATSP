@@ -8,28 +8,25 @@ import (
 
 // BranchAndBound struct that holds data for algorithm
 type BranchAndBound struct {
-	im    *algo.IncidenceMatrix
-	lower int
-	upper int
+	im *algo.IncidenceMatrix
 }
 
 // NewBranchAndBound is a constructor for BranchAndBound struct
 func NewBranchAndBound(im *algo.IncidenceMatrix) *BranchAndBound {
 	return &BranchAndBound{
-		im:    im.Copy(),
-		lower: 0,
-		upper: math.MaxInt64,
+		im: im.Copy(),
 	}
 }
 
 // Solve function that solves the tsp
 func (b *BranchAndBound) Solve() *methods.Res {
 	// create priority queue and add first element to it
+	minKnown := math.MaxInt64
+	var minKnownInstance algo.Array[int]
 	var q *PriorityQueue
 	{
 		tmpIm := b.im.Copy()
 		tmpVal := tmpIm.ReduceMatrix()
-		b.lower = tmpVal
 		tmpArr := []*Node{{
 			im:     tmpIm.Copy(),
 			todo:   b.im.GetAdj(0),
@@ -46,38 +43,41 @@ func (b *BranchAndBound) Solve() *methods.Res {
 		if err != nil {
 			panic(err)
 		}
-		if t.val <= b.upper {
-			if len(t.todo) != 0 {
-				for _, v := range t.todo {
-					tmp := &Node{
-						im:     t.im.Copy(),
-						parent: t,
-						self:   v,
-					}
-					tmp.im.DiscardRow(t.self)
-					tmp.im.DiscardCol(v)
-					tmp.im.SetWeight(v, t.self, -1)
-					par := t
-					for par.parent != nil {
-						par = par.parent
-					}
-					tmp.im.SetWeight(v, par.self, -1)
-					tmp.todo = tmp.im.GetAdj(v)
-					tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
+		if len(t.todo) != 0 {
+			for _, v := range t.todo {
+				tmp := &Node{
+					im:     t.im.Copy(),
+					parent: t,
+					self:   v,
+				}
+				tmp.im.DiscardRow(t.self)
+				tmp.im.DiscardCol(v)
+				tmp.im.SetWeight(v, t.self, -1)
+				par := t
+				for par.parent != nil {
+					par = par.parent
+				}
+				tmp.im.SetWeight(v, par.self, -1)
+				tmp.todo = tmp.im.GetAdj(v)
+				tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
+				if tmp.val <= minKnown {
 					q.Insert(tmp)
 				}
-			} else {
-				// if found the closest value then return
-				minKnown, minKnownInstance := b.calc(t)
-				return &methods.Res{
-					Value: minKnown,
-					Route: minKnownInstance.Reverse(),
-				}
 			}
-			q.RemoveBig()
+		} else {
+			tmpKnown, tmpKnownInstance := b.calc(t)
+			if tmpKnown < minKnown {
+				minKnown = tmpKnown
+				minKnownInstance = tmpKnownInstance
+				q.Remove(minKnown)
+			}
 		}
 	}
-	return nil
+
+	return &methods.Res{
+		Value: minKnown,
+		Route: minKnownInstance.Reverse(),
+	}
 }
 
 // calc is a function that calculates the current value for an BNB instance

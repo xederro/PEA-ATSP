@@ -37,7 +37,7 @@ func manual() {
 				allowed,
 				huh.NewOption[int]("Display matrix", WRITE),
 				huh.NewOption[int]("Solve by BruteForce", BRUTEFORCE),
-				huh.NewOption[int]("Solve by BranchAndBound's algorithm", BRANCHANDBOUND),
+				huh.NewOption[int]("Solve by BranchAndBound", BRANCHANDBOUND),
 			)
 		}
 
@@ -97,7 +97,7 @@ func manual() {
 							return data.Solve()
 						}).
 						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
-							fmt.Println("Results of BranchAndBound's algorithm:")
+							fmt.Println("Results of BranchAndBound:")
 							fmt.Println(time)
 							fmt.Println(data.Value)
 							fmt.Println(data.Route)

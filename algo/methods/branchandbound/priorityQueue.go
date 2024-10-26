@@ -105,14 +105,16 @@ func Min(pObj, cObj *Node) bool {
 	return pObj.val < cObj.val
 }
 
-// RemoveBig leaves 10000 instances with smallest current values
-func (h *PriorityQueue) RemoveBig() *PriorityQueue {
+// Remove removes on new best
+func (h *PriorityQueue) Remove(bound int) *PriorityQueue {
 	sort.Slice(h.arr, func(i, j int) bool {
 		return Min(h.arr[i], h.arr[j])
 	})
-	if len(h.arr) >= 10000 {
-		h.arr = h.arr[:10000]
+	i := 0
+	for ; i <= len(h.arr)-1 && h.arr[i].val < bound; i++ {
+		continue
 	}
+	h.arr = h.arr[:i+1]
 	h.BuildQueue()
 	return h
 }

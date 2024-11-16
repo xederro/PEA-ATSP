@@ -12,20 +12,16 @@ def read_csv(file_path):
     with open(file_path, "r") as file:
         reader = csv.reader(file, delimiter=";")
         for row in reader:
-            algorithm, data_type, array, modifier, size, time_in_nanoseconds = row
+            algorithm, size, good, todo, time_in_nanoseconds = row
             size = int(size)
             time_in_nanoseconds = int(time_in_nanoseconds)
-            name = f"{algorithm} {data_type} {array}"
-            if modifier != "":
-                name += f" {modifier}"
-            if name not in data:
-                data[name] = {
-                    "data": [algorithm, data_type, array, modifier],
+            if algorithm not in data:
+                data[algorithm] = {
                     "size": [],
                     "time_in_nanoseconds": [],
                 }
-            data[name]["size"].append(size)
-            data[name]["time_in_nanoseconds"].append(time_in_nanoseconds)
+            data[algorithm]["size"].append(size)
+            data[algorithm]["time_in_nanoseconds"].append(time_in_nanoseconds)
     return data
 
 
@@ -34,111 +30,40 @@ def plot_specific_data(data, save_folder):
     specific_plots = [
         {
             "algorithm": None,
-            "data_type": "Incidence Matrix",
-            "array": None,
-            "modifier": "MST",
         },
         {
-            "algorithm": None,
-            "data_type": "Adjacency List",
-            "array": None,
-            "modifier": "MST",
+            "algorithm": "Brute Force",
         },
         {
-            "algorithm": None,
-            "data_type": "Incidence Matrix",
-            "array": None,
-            "modifier": "SP",
+            "algorithm": "Branch and Bound",
         },
         {
-            "algorithm": None,
-            "data_type": "Adjacency List",
-            "array": None,
-            "modifier": "SP",
+            "algorithm": "Dynamic programming",
         },
-        {
-            "algorithm": None,
-            "data_type": "Incidence Matrix",
-            "array": None,
-            "modifier": "MAX",
-        },
-        {
-            "algorithm": None,
-            "data_type": "Adjacency List",
-            "array": None,
-            "modifier": "MAX",
-        },
-        {"algorithm": None, "data_type": None, "array": "50%", "modifier": "MST",},
-        {"algorithm": None, "data_type": None, "array": "25%", "modifier": "MST",},
-        {"algorithm": None, "data_type": None, "array": "99%", "modifier": "MST",},
-        {"algorithm": None, "data_type": None, "array": "50%", "modifier": "SP",},
-        {"algorithm": None, "data_type": None, "array": "25%", "modifier": "SP",},
-        {"algorithm": None, "data_type": None, "array": "99%", "modifier": "SP",},
-        {"algorithm": None, "data_type": None, "array": "50%", "modifier": "MAX",},
-        {"algorithm": None, "data_type": None, "array": "25%", "modifier": "MAX",},
-        {"algorithm": None, "data_type": None, "array": "99%", "modifier": "MAX",},
-
-        {'algorithm': None, 'data_type': 'Incidence Matrix', 'array': None, 'modifier': 'MST',},
-        {'algorithm': None, 'data_type': 'Adjacency List', 'array': None, 'modifier': 'MST',},
-        {'algorithm': None, 'data_type': 'Incidence Matrix', 'array': None, 'modifier': 'SP',},
-        {'algorithm': None, 'data_type': 'Adjacency List', 'array': None, 'modifier': 'SP',},
-        {'algorithm': None, 'data_type': 'Incidence Matrix', 'array': None, 'modifier': 'MAX',},
-        {'algorithm': None, 'data_type': 'Adjacency List', 'array': None, 'modifier': 'MAX',},
-
-
-        {'algorithm': None, 'data_type': None, 'array': '50%', 'modifier': 'MST',},
-        {'algorithm': None, 'data_type': None, 'array': '75%', 'modifier': 'MST',},
-        {'algorithm': None, 'data_type': None, 'array': '99%', 'modifier': 'MST',},
-        {'algorithm': None, 'data_type': None, 'array': '50%', 'modifier': 'SP',},
-        {'algorithm': None, 'data_type': None, 'array': '75%', 'modifier': 'SP',},
-        {'algorithm': None, 'data_type': None, 'array': '99%', 'modifier': 'SP',},
-        {'algorithm': None, 'data_type': None, 'array': '50%', 'modifier': 'MAX',},
-        {'algorithm': None, 'data_type': None, 'array': '75%', 'modifier': 'MAX',},
-        {'algorithm': None, 'data_type': None, 'array': '99%', 'modifier': 'MAX',},
     ]
 
     for plot_spec in specific_plots:
         plt.figure(figsize=(10, 6))
-        for _, values in data.items():
-            algorithm, data_type, array, modifier = values["data"]
-            if (
-                (plot_spec["algorithm"] is None or plot_spec["algorithm"] == algorithm)
-                and (
-                    plot_spec["data_type"] is None
-                    or plot_spec["data_type"] == data_type
-                )
-                and (plot_spec["modifier"] is None or plot_spec["modifier"] == modifier)
-                and (plot_spec["array"] is None or plot_spec["array"] == array)
-            ):
+        for algorithm, values in data.items():
+            if plot_spec["algorithm"] is None or plot_spec["algorithm"] == algorithm:
                 x = values["size"]
                 y = values["time_in_nanoseconds"]
                 X_Y_Spline = make_interp_spline(x, y)
                 X_ = np.linspace(min(x), max(x), 500)
                 Y_ = X_Y_Spline(X_)
-                label = ""
-                if plot_spec["algorithm"] is None:
-                    label += f"{algorithm} "
-                if plot_spec["data_type"] is None:
-                    label += f"{data_type} "
-                if plot_spec["array"] is None:
-                    label += f"{array} "
-                if plot_spec["modifier"] is None:
-                    label += f"{modifier}"
+                label = f"{algorithm} "
                 plt.plot(X_, Y_, "-", label=label)
                 plt.scatter(x, y)
 
         label = ""
         if plot_spec["algorithm"] is not None:
             label += f"{plot_spec['algorithm']} "
-        if plot_spec["data_type"] is not None:
-            label += f"{plot_spec['data_type']} "
-        if plot_spec["array"] is not None:
-            label += f"{plot_spec['array']} "
-        if plot_spec["modifier"] is not None:
-            label += f"{plot_spec['modifier']} "
+        if plot_spec["algorithm"] is None:
+            label = "hewwo"
 
         label = label.strip()
         #         plt.title(label)
+
         plt.xlabel("Size")
         plt.ylabel("Time")
         plt.legend()

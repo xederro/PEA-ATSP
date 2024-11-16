@@ -35,7 +35,7 @@ func NewIncidenceMatrixFromFile(path string) *IncidenceMatrix {
 		return nil
 	}
 	im := NewIncidenceMatrix(atoi)
-	for y, v := range ret[1:] {
+	for y, v := range ret[1 : im.Len()+1] {
 		lines := r.FindAllString(v, -1)
 		for x, val := range lines {
 			weight, err := strconv.Atoi(val)

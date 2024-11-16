@@ -12,7 +12,6 @@ type TimeTestObject struct {
 	before        func(size int) methods.Method
 	measure       func(data methods.Method) *methods.Res
 	after         func(name string, nr int, testSize int, time time.Duration, data *methods.Res)
-	time          time.Duration
 	print         bool
 	timeout       time.Duration
 	failOnTimeout bool

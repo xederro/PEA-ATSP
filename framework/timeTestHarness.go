@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/xederro/PEA-ATSP/algo/methods"
+	"runtime"
+	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -38,37 +40,42 @@ func (test *TimeTestHarness) AddTest(t *TimeTestObject) *TimeTestHarness {
 func (test *TimeTestHarness) Exec() {
 	for _, t := range test.tests {
 		for _, size := range test.sizes {
+			testTime := time.Duration(0)
 			for i := range test.repeat {
-				if t.failOnTimeout {
-					d := t.before(size)
-					out := make(chan *methods.Res, 1)
-					ctxTimeout, cancel := context.WithTimeout(context.TODO(), t.timeout)
-					start := time.Now()
-					go func(ctx context.Context, ch chan *methods.Res) {
-						ch <- t.measure(d)
-					}(ctxTimeout, out)
-					select {
-					case res := <-out:
-						m := res
+				{
+					if t.failOnTimeout {
+						d := t.before(size)
+						out := make(chan *methods.Res, 1)
+						ctxTimeout, cancel := context.WithTimeout(context.TODO(), t.timeout)
+						start := time.Now()
+						go func(ctx context.Context, ch chan *methods.Res) {
+							ch <- t.measure(d)
+						}(ctxTimeout, out)
+						select {
+						case res := <-out:
+							m := res
+							dur := time.Since(start)
+							testTime += dur
+							t.after(t.name, i, size, dur, m)
+						case <-ctxTimeout.Done():
+							t.failed++
+						}
+						cancel()
+					} else {
+						d := t.before(size)
+						start := time.Now()
+						m := t.measure(d)
 						dur := time.Since(start)
-						t.time += dur
+						testTime += dur
 						t.after(t.name, i, size, dur, m)
-					case <-ctxTimeout.Done():
-						t.failed++
 					}
-					cancel()
-				} else {
-					d := t.before(size)
-					start := time.Now()
-					m := t.measure(d)
-					dur := time.Since(start)
-					t.time += dur
-					t.after(t.name, i, size, dur, m)
 				}
+				debug.FreeOSMemory()
+				runtime.GC()
 			}
 
 			if t.print {
-				fmt.Printf("%s;%d;%d;%d;%d\n", t.name, size, t.failed, test.repeat, t.time.Nanoseconds()/int64(test.repeat-t.failed))
+				fmt.Printf("%s;%d;%d;%d;%d\n", t.name, size, t.failed, test.repeat, testTime.Nanoseconds()/int64(test.repeat-t.failed))
 			}
 		}
 	}

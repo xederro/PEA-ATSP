@@ -118,3 +118,10 @@ func (h *PriorityQueue) Remove(bound int) *PriorityQueue {
 	h.BuildQueue()
 	return h
 }
+
+func (h *PriorityQueue) RemoveN() {
+	n := 100000
+	if len(h.arr) > n {
+		h.arr = h.arr[:n]
+	}
+}

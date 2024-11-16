@@ -7,6 +7,7 @@ import (
 	"github.com/xederro/PEA-ATSP/algo/methods"
 	"github.com/xederro/PEA-ATSP/algo/methods/branchandbound"
 	"github.com/xederro/PEA-ATSP/algo/methods/bruteforce"
+	"github.com/xederro/PEA-ATSP/algo/methods/memoization"
 	"github.com/xederro/PEA-ATSP/framework"
 	"github.com/xederro/PEA-ATSP/utils"
 	"time"
@@ -18,6 +19,7 @@ const (
 	WRITE
 	BRUTEFORCE
 	BRANCHANDBOUND
+	MEMOIZATION
 	EXIT
 )
 
@@ -36,8 +38,9 @@ func manual() {
 			allowed = append(
 				allowed,
 				huh.NewOption[int]("Display matrix", WRITE),
-				huh.NewOption[int]("Solve by BruteForce", BRUTEFORCE),
-				huh.NewOption[int]("Solve by BranchAndBound", BRANCHANDBOUND),
+				huh.NewOption[int]("Solve by Brute Force", BRUTEFORCE),
+				huh.NewOption[int]("Solve by Branch And Bound", BRANCHANDBOUND),
+				huh.NewOption[int]("Solve by Dynamic Programming", MEMOIZATION),
 			)
 		}
 
@@ -70,7 +73,7 @@ func manual() {
 		case BRUTEFORCE:
 			framework.NewTimeTestHarness(1, 0).
 				AddTest(
-					framework.NewTimeTestObject("BruteForce", false, false).
+					framework.NewTimeTestObject("Brute Force", false, false).
 						SetBefore(func(size int) methods.Method {
 							return bruteforce.NewBruteforce(im)
 						}).
@@ -78,7 +81,7 @@ func manual() {
 							return data.Solve()
 						}).
 						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
-							fmt.Println("Results of BruteForce:")
+							fmt.Println("Results of Brute Force:")
 							fmt.Println(time)
 							fmt.Println(data.Value)
 							fmt.Println(data.Route)
@@ -89,7 +92,7 @@ func manual() {
 		case BRANCHANDBOUND:
 			framework.NewTimeTestHarness(1, 0).
 				AddTest(
-					framework.NewTimeTestObject("BranchAndBound", false, false).
+					framework.NewTimeTestObject("Branch And Bound", false, false).
 						SetBefore(func(size int) methods.Method {
 							return branchandbound.NewBranchAndBound(im)
 						}).
@@ -97,7 +100,26 @@ func manual() {
 							return data.Solve()
 						}).
 						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
-							fmt.Println("Results of BranchAndBound:")
+							fmt.Println("Results of Branch And Bound:")
+							fmt.Println(time)
+							fmt.Println(data.Value)
+							fmt.Println(data.Route)
+						}),
+				).
+				Exec()
+			break
+		case MEMOIZATION:
+			framework.NewTimeTestHarness(1, 0).
+				AddTest(
+					framework.NewTimeTestObject("Dynamic Programming", false, false).
+						SetBefore(func(size int) methods.Method {
+							return memoization.NewMemoization(im)
+						}).
+						SetMeasure(func(data methods.Method) *methods.Res {
+							return data.Solve()
+						}).
+						SetAfter(func(name string, nr int, testSize int, time time.Duration, data *methods.Res) {
+							fmt.Println("Results of Dynamic Programming:")
 							fmt.Println(time)
 							fmt.Println(data.Value)
 							fmt.Println(data.Route)

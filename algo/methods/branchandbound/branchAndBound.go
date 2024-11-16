@@ -53,14 +53,10 @@ func (b *BranchAndBound) Solve() *methods.Res {
 				tmp.im.DiscardRow(t.self)
 				tmp.im.DiscardCol(v)
 				tmp.im.SetWeight(v, t.self, -1)
-				par := t
-				for par.parent != nil {
-					par = par.parent
-				}
-				tmp.im.SetWeight(v, par.self, -1)
+				tmp.im.SetWeight(v, 0, -1)
 				tmp.todo = tmp.im.GetAdj(v)
 				tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
-				if tmp.val <= minKnown {
+				if tmp.val < minKnown {
 					q.Insert(tmp)
 				}
 			}

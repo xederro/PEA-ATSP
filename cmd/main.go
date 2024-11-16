@@ -12,6 +12,7 @@ func main() {
 	conf := tests.Config{
 		RunBruteForce:     flag.Bool("bf", false, "Run bruteforce method"),
 		RunBranchAndBound: flag.Bool("bab", false, "Run branch and bound method"),
+		RunMemoization:    flag.Bool("m", false, "Run memoization method"),
 		Repeat:            flag.Int("rep", -1, "How many times to repeat each iteration"),
 		Concurrent:        flag.Bool("con", false, "Run concurrent method"),
 	}

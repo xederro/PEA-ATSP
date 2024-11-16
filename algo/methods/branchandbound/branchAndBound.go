@@ -25,10 +25,9 @@ func (b *BranchAndBound) Solve() *methods.Res {
 	var minKnownInstance algo.Array[int]
 	var q *PriorityQueue
 	{
-		tmpIm := b.im.Copy()
-		tmpVal := tmpIm.ReduceMatrix()
+		tmpVal := b.im.ReduceMatrix()
 		tmpArr := []*Node{{
-			im:     tmpIm.Copy(),
+			im:     b.im.Copy(),
 			todo:   b.im.GetAdj(0),
 			parent: nil,
 			self:   0,
@@ -43,29 +42,29 @@ func (b *BranchAndBound) Solve() *methods.Res {
 		if err != nil {
 			panic(err)
 		}
-		if len(t.todo) != 0 {
-			for _, v := range t.todo {
-				tmp := &Node{
-					im:     t.im.Copy(),
-					parent: t,
-					self:   v,
-				}
-				tmp.im.DiscardRow(t.self)
-				tmp.im.DiscardCol(v)
-				tmp.im.SetWeight(v, t.self, -1)
-				tmp.im.SetWeight(v, 0, -1)
-				tmp.todo = tmp.im.GetAdj(v)
-				tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
+		for _, v := range t.todo {
+			tmp := &Node{
+				im:     t.im.Copy(),
+				parent: t,
+				self:   v,
+			}
+			tmp.im.DiscardRow(t.self)
+			tmp.im.DiscardCol(v)
+			tmp.im.SetWeight(v, t.self, -1)
+			tmp.im.SetWeight(v, 0, -1)
+			tmp.todo = tmp.im.GetAdj(v)
+			tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
+			if len(tmp.todo) != 0 {
 				if tmp.val < minKnown {
 					q.Insert(tmp)
 				}
-			}
-		} else {
-			tmpKnown, tmpKnownInstance := b.calc(t)
-			if tmpKnown < minKnown {
-				minKnown = tmpKnown
-				minKnownInstance = tmpKnownInstance
-				q.Remove(minKnown)
+			} else {
+				tmpKnownInstance := b.calc(tmp)
+				if t.val < minKnown {
+					minKnown = t.val
+					minKnownInstance = tmpKnownInstance
+					q.Remove(minKnown)
+				}
 			}
 		}
 	}
@@ -77,17 +76,14 @@ func (b *BranchAndBound) Solve() *methods.Res {
 }
 
 // calc is a function that calculates the current value for an BNB instance
-func (b *BranchAndBound) calc(a *Node) (int, algo.Array[int]) {
-	count := 0
+func (b *BranchAndBound) calc(a *Node) algo.Array[int] {
 	in := algo.NewArray[int](0)
 	root := a
 	for root.parent != nil {
-		count += b.im.GetWeight(root.parent.self, root.self)
 		root = root.parent
 		in = append(in, root.self)
 	}
-	count += b.im.GetWeight(a.self, root.self)
 	in = append([]int{a.self}, in...)
 
-	return count, in
+	return in
 }

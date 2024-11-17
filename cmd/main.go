@@ -8,6 +8,7 @@ import (
 	"runtime/pprof"
 )
 
+// main is the entry point of the program.
 func main() {
 	conf := tests.Config{
 		RunBruteForce:     flag.Bool("bf", false, "Run bruteforce method"),
@@ -20,6 +21,7 @@ func main() {
 	flag.Parse()
 	ts := flag.Args()
 
+	// If the -cpu flag is set, start the CPU profiler.
 	if *perf {
 		f, err := os.Create("cpu_profile.prof")
 		if err != nil {
@@ -33,12 +35,14 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	// Parse the arguments.
 	args, err := utils.ParseArgs(ts)
 	if err != nil {
 		os.Exit(1)
 	}
 	conf.Sizes = args
 
+	// Run the tests.
 	if conf.Repeat != nil && *conf.Repeat > 0 {
 		conf.Run()
 	} else {

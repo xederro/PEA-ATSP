@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// Config is a struct that holds the configuration for the tests
 type Config struct {
 	RunBruteForce     *bool
 	RunBranchAndBound *bool
@@ -20,8 +21,10 @@ type Config struct {
 	Concurrent        *bool
 }
 
+// Run runs the tests based on the configuration
 func (c Config) Run() {
 	if c.Concurrent != nil && *c.Concurrent == true {
+		// tests are run concurrently
 		wg := &sync.WaitGroup{}
 		if c.RunBruteForce != nil && *c.RunBruteForce == true {
 			wg.Add(1)
@@ -37,6 +40,7 @@ func (c Config) Run() {
 		}
 		wg.Wait()
 	} else {
+		// tests are run sequentially
 		if c.RunBruteForce != nil && *c.RunBruteForce == true {
 			c.runBruteForce(nil, *c.Repeat, c.Sizes...)
 		}
@@ -49,6 +53,7 @@ func (c Config) Run() {
 	}
 }
 
+// runBruteForce runs the BruteForce tests
 func (c Config) runBruteForce(wg *sync.WaitGroup, count int, sizes ...int) {
 	framework.NewTimeTestHarness(count, sizes...).
 		AddTest(
@@ -67,6 +72,7 @@ func (c Config) runBruteForce(wg *sync.WaitGroup, count int, sizes ...int) {
 		ExecWG(wg)
 }
 
+// runBranchAndBound runs the BranchAndBound tests
 func (c Config) runBranchAndBound(wg *sync.WaitGroup, count int, sizes ...int) {
 	framework.NewTimeTestHarness(count, sizes...).
 		AddTest(
@@ -85,6 +91,7 @@ func (c Config) runBranchAndBound(wg *sync.WaitGroup, count int, sizes ...int) {
 		ExecWG(wg)
 }
 
+// runMemoization runs the Memoization tests
 func (c Config) runMemoization(wg *sync.WaitGroup, count int, sizes ...int) {
 	framework.NewTimeTestHarness(count, sizes...).
 		AddTest(

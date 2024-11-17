@@ -15,12 +15,14 @@ type IncidenceMatrix []Array[int]
 
 // NewIncidenceMatrixFromFile creates a new IncidenceMatrix
 func NewIncidenceMatrixFromFile(path string) *IncidenceMatrix {
+	// read file
 	file, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
+	// split file into lines
 	f := strings.ReplaceAll(string(file), "\r", "")
 	ret := strings.Split(f, "\n")
 	atoi, err := strconv.Atoi(ret[0])
@@ -34,7 +36,9 @@ func NewIncidenceMatrixFromFile(path string) *IncidenceMatrix {
 		fmt.Println(err)
 		return nil
 	}
+	// create new IncidenceMatrix of size atoi
 	im := NewIncidenceMatrix(atoi)
+	// populate IncidenceMatrix with values from file
 	for y, v := range ret[1 : im.Len()+1] {
 		lines := r.FindAllString(v, -1)
 		for x, val := range lines {
@@ -180,6 +184,7 @@ func (m *IncidenceMatrix) Copy() *IncidenceMatrix {
 	return (*IncidenceMatrix)(&al)
 }
 
+// GetMinCol returns the minimum value in a column
 func (b *IncidenceMatrix) GetMinCol(col int) int {
 	minVal := math.MaxInt32
 	for i := range b.Len() {
@@ -193,6 +198,7 @@ func (b *IncidenceMatrix) GetMinCol(col int) int {
 	return minVal
 }
 
+// GetMinRow returns the minimum value in a row
 func (b *IncidenceMatrix) GetMinRow(row int) int {
 	minVal := math.MaxInt32
 	for i := range b.Len() {
@@ -206,6 +212,7 @@ func (b *IncidenceMatrix) GetMinRow(row int) int {
 	return minVal
 }
 
+// ReduceCol reduces a column in the matrix by the minimum value in the column
 func (b *IncidenceMatrix) ReduceCol(col int) int {
 	m := b.GetMinCol(col)
 	if m == 0 {
@@ -219,6 +226,7 @@ func (b *IncidenceMatrix) ReduceCol(col int) int {
 	return m
 }
 
+// ReduceRow reduces a row in the matrix by the minimum value in the row
 func (b *IncidenceMatrix) ReduceRow(row int) int {
 	m := b.GetMinRow(row)
 	if m == 0 {
@@ -232,18 +240,21 @@ func (b *IncidenceMatrix) ReduceRow(row int) int {
 	return m
 }
 
+// DiscardCol sets all values in a column to -1
 func (b *IncidenceMatrix) DiscardCol(col int) {
 	for i := range b.Len() {
 		(*b)[i][col] = -1
 	}
 }
 
+// DiscardRow sets all values in a row to -1
 func (b *IncidenceMatrix) DiscardRow(row int) {
 	for i := range b.Len() {
 		(*b)[row][i] = -1
 	}
 }
 
+// ReduceMatrix reduces the matrix
 func (b *IncidenceMatrix) ReduceMatrix() int {
 	reduced := 0
 	for i := range b.Len() {

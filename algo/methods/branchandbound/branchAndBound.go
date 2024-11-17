@@ -48,17 +48,22 @@ func (b *BranchAndBound) Solve() *methods.Res {
 				parent: t,
 				self:   v,
 			}
+			// discard row and column
 			tmp.im.DiscardRow(t.self)
 			tmp.im.DiscardCol(v)
 			tmp.im.SetWeight(v, t.self, -1)
 			tmp.im.SetWeight(v, 0, -1)
+			// get neighbours of current node
 			tmp.todo = tmp.im.GetAdj(v)
 			tmp.val = t.val + tmp.im.ReduceMatrix() + t.im.GetWeight(t.self, v)
+			// if there are still nodes to visit
 			if len(tmp.todo) != 0 {
+				// if current value is lower than the lowest known value then add it to the queue
 				if tmp.val < minKnown {
 					q.Insert(tmp)
 				}
 			} else {
+				// if there are no nodes to visit then calculate the value and compare it to the lowest known value
 				tmpKnownInstance := b.calc(tmp)
 				if t.val < minKnown {
 					minKnown = t.val

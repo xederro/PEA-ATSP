@@ -6,16 +6,19 @@ import (
 	"math"
 )
 
+// Bruteforce is a struct that represents the Bruteforce method
 type Bruteforce struct {
 	im *algo.IncidenceMatrix
 }
 
+// NewBruteforce is a function that creates a new Bruteforce instance
 func NewBruteforce(im *algo.IncidenceMatrix) *Bruteforce {
 	return &Bruteforce{
 		im: im.Copy(),
 	}
 }
 
+// Solve is a method that solves the ATSP problem using the Bruteforce method
 func (b *Bruteforce) Solve() *methods.Res {
 	// get every permutation using quick perm algorithm https://www.quickperm.org/
 	a := algo.Array[int](b.im.GetNodes())[1:]

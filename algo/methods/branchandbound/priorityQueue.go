@@ -119,6 +119,7 @@ func (h *PriorityQueue) Remove(bound int) *PriorityQueue {
 	return h
 }
 
+// RemoveN removes all but the first n elements
 func (h *PriorityQueue) RemoveN() {
 	n := 100000
 	if len(h.arr) > n {

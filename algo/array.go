@@ -136,12 +136,14 @@ func (arr Array[T]) Swap(p1, p2 int) {
 	}
 }
 
+// Copy is a method that creates a copy of the array
 func (arr Array[T]) Copy() Array[T] {
 	c := NewArray[T](len(arr))
 	copy(c, arr)
 	return c
 }
 
+// Reverse is a method that reverses the array
 func (arr Array[T]) Reverse() Array[T] {
 	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
 		arr[i], arr[j] = arr[j], arr[i]
